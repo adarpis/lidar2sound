@@ -14,6 +14,9 @@ Edy Ayala and Universidad Politecnica Salesiana, for all theirs support on this.
 #   - 
 
 import sys
+
+from sweeppy import Sweep
+
 from time import sleep
 from pythonosc import osc_message_builder
 from pythonosc import udp_client
