@@ -21,9 +21,8 @@ from time import sleep
 from pythonosc import osc_message_builder
 from pythonosc import udp_client
 
-sender = udp_client.SimpleUDPClient('127.0.0.1', 4559)
-
-if __name__ == '__main__': 
+def main():
+    sender = udp_client.SimpleUDPClient('127.0.0.1', 4559)
     while True:
         try:
             for note in range(40, 120, 10):
@@ -34,3 +33,6 @@ if __name__ == '__main__':
                 sleep(0.5)
         except KeyboardInterrupt:
             sys.exit(0)
+
+if __name__ == '__main__': 
+    main()
