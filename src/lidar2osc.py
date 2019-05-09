@@ -2,7 +2,7 @@
 """Translate data from LIDAR Scanse to OSC format. This is used to command
 Sonic Pi script attached as part of this project
 """
-__all__ = ['help']
+#__all__ = ['help']
 __author__ = "Adrian Arpi <aarpi@imaytec.com>"
 __date__ = "20 February 2019"
 
