@@ -68,10 +68,11 @@ class Scanner(threading.Thread):
             if self.done.is_set():
                 self.queue.put_nowait(None)
 
-class SampleCounter(threading.Thread):
+class TriggerOSC(threading.Thread):
     def __init__(self, queue):
         super().__init__()
         self.queue = queue
+        self.sender = udp_client.SimpleUDPClient('127.0.0.1', 4559)
 
     # Iterate over the queue's scans blocking if the queue is
     # empty. If we see the producer's sentinel value we exit.
@@ -89,6 +90,7 @@ class SampleCounter(threading.Thread):
                 break
 
             print(len(scan.samples))
+            self.sender.send_message('/trigger/prophet', [50, 100, 0.5])
             self.queue.task_done()
 
 
@@ -104,26 +106,18 @@ def main():
     fifo = queue.Queue()
 
     scanner = Scanner(dev, fifo, done)
-    counter = SampleCounter(fifo)
+    counter = TriggerOSC(fifo)
 
     scanner.start()
     counter.start()
     timer.start()
 
-# def main():
-
-#     if len(sys.argv) < 2:
-#         sys.exit('python lidar2osc.py /dev/ttyUSB0')
-
-#     sender = udp_client.SimpleUDPClient('127.0.0.1', 4559)
-#     while True:
-#         try:
-#             for note in range(40, 120, 10):
-#                 sender.send_message('/trigger/prophet', [note, 100, 0.5])    
-#             for note in range(120, 40, -10):
-#                 sender.send_message('/trigger/prophet', [note, 100, 0.5])
-#         except KeyboardInterrupt:
-#             sys.exit(0)
+    while True:
+        try:
+            pass
+        except KeyboardInterrupt:
+            done.set()
+            sys.exit(0)
 
 if __name__ == '__main__': 
     main()
