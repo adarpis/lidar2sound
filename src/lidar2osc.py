@@ -16,6 +16,7 @@ Edy Ayala and Universidad Politecnica Salesiana, for all theirs support on this.
 import sys
 import queue
 import threading
+from time import sleep
 
 __if_sweeppy__ = True
 try:
@@ -65,8 +66,12 @@ class Scanner(threading.Thread):
 
                 sweep.stop_scanning()
         else:
-            if self.done.is_set():
-                self.queue.put_nowait(None)
+            while True:
+                if self.done.is_set():
+                    self.queue.put_nowait(None)
+                    break
+                sleep(1)
+
 
 class TriggerOSC(threading.Thread):
     def __init__(self, queue):
@@ -98,6 +103,10 @@ def main():
     if len(sys.argv) < 2:
         sys.exit('python lidar2osc.py /dev/ttyUSB0')
 
+    if not __if_sweeppy__:
+        print('SweepPy module is nedded, '
+        'please check https://github.com/scanse/sweep-sdk/tree/master/sweeppy')
+
     dev = sys.argv[1]
 
     done = threading.Event()
@@ -114,9 +123,9 @@ def main():
 
     while True:
         try:
-            pass
+            sleep(1)
         except KeyboardInterrupt:
-            done.set()
+            # done.set()
             sys.exit(0)
 
 if __name__ == '__main__': 
