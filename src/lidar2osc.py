@@ -59,6 +59,7 @@ class Scanner(threading.Thread):
 
                 for scan in sweep.get_scans():
                     if self.done.is_set():
+                        sweep.set_motor_speed(0)
                         self.queue.put_nowait(None)
                         break
                     else:
@@ -92,6 +93,7 @@ class TriggerOSC(threading.Thread):
             scan = self.queue.get()
 
             if not scan:
+                print('Expiration time has been over. Stopping execution')
                 break
 
             print(len(scan.samples))
@@ -110,7 +112,7 @@ def main():
     dev = sys.argv[1]
 
     done = threading.Event()
-    timer = threading.Timer(3, lambda: done.set())
+    timer = threading.Timer(10, lambda: done.set())
 
     fifo = queue.Queue()
 
@@ -124,8 +126,11 @@ def main():
     while True:
         try:
             sleep(1)
+            if done.is_set():
+                sys.exit(0)
+                break
         except KeyboardInterrupt:
-            # done.set()
+            done.set()
             sys.exit(0)
 
 if __name__ == '__main__': 
