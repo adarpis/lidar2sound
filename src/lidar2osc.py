@@ -102,7 +102,8 @@ class TriggerOSC(threading.Thread):
                 break
 
             print(len(scan.samples))
-            # self.sender.send_message('/trigger/prophet', [50, 100, 0.5])
+            print([sample.angle for sample in scan.samples])
+            self.sender.send_message('/trigger/prophet', [50, 100, 0.5])
             self.queue.task_done()
 
 
@@ -112,7 +113,8 @@ def main():
 
     if not __if_sweeppy__:
         print('SweepPy module is nedded, '
-        'please check https://github.com/scanse/sweep-sdk/tree/master/sweeppy')
+        'please check https://github.com/scanse/sweep-sdk/tree/master/sweeppy '
+        'Actually is running a emulator for test porpuses')
 
     dev = sys.argv[1]
 
