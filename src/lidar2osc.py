@@ -22,6 +22,7 @@ __if_sweeppy__ = True
 try:
     from sweeppy import Sweep
 except ImportError:
+    from emu_sweepy import Sweep
     __if_sweeppy__ = False
 
 from pythonosc import osc_message_builder
@@ -67,11 +68,15 @@ class Scanner(threading.Thread):
 
                 sweep.stop_scanning()
         else:
-            while True:
-                if self.done.is_set():
-                    self.queue.put_nowait(None)
-                    break
-                sleep(1)
+            with Sweep() as sweep:
+
+                for scan in sweep.get_scans():
+                    if self.done.is_set():
+                        self.queue.put_nowait(None)
+                        break
+                    else:
+                        self.queue.put_nowait(scan)
+                    
 
 
 class TriggerOSC(threading.Thread):
@@ -97,7 +102,7 @@ class TriggerOSC(threading.Thread):
                 break
 
             print(len(scan.samples))
-            self.sender.send_message('/trigger/prophet', [50, 100, 0.5])
+            # self.sender.send_message('/trigger/prophet', [50, 100, 0.5])
             self.queue.task_done()
 
 
