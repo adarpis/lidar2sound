@@ -32,8 +32,8 @@ class Sweep:
 
     def get_scans(self):
         num_samples = 100
-        angles = range(0,360000, int(360000/num_samples))
-        distances = range(4000,0, int(4000/num_samples))
+        angles = [angle for angle in range(0,360000, int(360000/num_samples))]
+        distances = [distance for distance in range(4000,0, int(-4000/num_samples))]
         signal_strengths = [200] * num_samples
 
         while True:
