@@ -11,7 +11,7 @@ Edy Ayala and Universidad Politecnica Salesiana, for all theirs support on this.
 """
 
 # Known bugs that can't be fixed here:
-#   - 
+#   -
 
 import sys
 import queue
@@ -29,7 +29,6 @@ from pythonosc import osc_message_builder
 from pythonosc import udp_client
 
 
-
 # Below we create three worker threads:
 #  - The producer thread continuously putting scans into an unbounded queue
 #  - The consumer thread continuously pulling scans out of an unbounded queue
@@ -40,7 +39,6 @@ from pythonosc import udp_client
 #    produce otherwise memory usage will grow over time.
 #  - If you make the queue bounded look into queue `put` and `get` functions
 #    and their blocking behavior. You probably want a ringbuffer semantic.
-
 
 
 class Scanner(threading.Thread):
@@ -76,7 +74,6 @@ class Scanner(threading.Thread):
                         break
                     else:
                         self.queue.put_nowait(scan)
-                    
 
 
 class TriggerOSC(threading.Thread):
@@ -113,8 +110,8 @@ def main():
 
     if not __if_sweeppy__:
         print('SweepPy module is nedded, '
-        'please check https://github.com/scanse/sweep-sdk/tree/master/sweeppy '
-        'Actually is running a emulator for test porpuses')
+              'please check https://github.com/scanse/sweep-sdk/tree/master/sweeppy '
+              'Actually is running a emulator for test porpuses')
 
     dev = sys.argv[1]
 
@@ -140,5 +137,6 @@ def main():
             done.set()
             sys.exit(0)
 
-if __name__ == '__main__': 
+
+if __name__ == '__main__':
     main()
