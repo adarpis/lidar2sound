@@ -28,6 +28,8 @@ except ImportError:
 from pythonosc import osc_message_builder
 from pythonosc import udp_client
 
+from statistics import median
+
 
 # Below we create three worker threads:
 #  - The producer thread continuously putting scans into an unbounded queue
@@ -83,15 +85,14 @@ class TriggerOSC(threading.Thread):
         self.sender = udp_client.SimpleUDPClient('127.0.0.1', 4559)
 
     def __sweep2osc(self, scan):
-        num_notes = 24
-        notes = [[] for i in range(num_notes)]
+        num_notes = 14
+        rnotes = [[] for i in range(num_notes)]
         for angle, distance, signal_strength in scan.samples:
             if signal_strength > 150:
-                notes[int(angle * (num_notes/360000))].append(distance)
-            
+                rnotes[int(angle * (num_notes/360000))].append(distance)
+        notes = [median(note)/4000 for note in rnotes]
         print(notes)
-
-        self.sender.send_message('/trigger/prophet', [50, 100, 0.5])
+        self.sender.send_message('/trigger/prophet', notes)
 
     # Iterate over the queue's scans blocking if the queue is
     # empty. If we see the producer's sentinel value we exit.
