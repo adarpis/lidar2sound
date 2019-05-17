@@ -89,7 +89,7 @@ class TriggerOSC(threading.Thread):
         rnotes = [[] for i in range(num_notes)]
         for angle, distance, signal_strength in scan.samples:
             if signal_strength > 150:
-                rnotes[int(angle * (num_notes/360000))].append(distance)
+                rnotes[int(angle * (num_notes/360000))].append(4000 - distance)
         notes = [median(note)/4000 for note in rnotes]
         print(notes)
         self.sender.send_message('/trigger/prophet', notes)
