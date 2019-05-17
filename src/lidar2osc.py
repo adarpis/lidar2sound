@@ -7,7 +7,7 @@ __author__ = "Adrian Arpi <aarpi@imaytec.com>"
 __date__ = "20 February 2019"
 
 __credits__ = """Guido van Rossum, for an excellent programming language.
-Edy Ayala and Universidad Politecnica Salesiana, for all theirs support on this.
+Edy Ayala and Universidad Politecnica Salesiana, for all theirs support on this project.
 """
 
 # Known bugs that can't be fixed here:
