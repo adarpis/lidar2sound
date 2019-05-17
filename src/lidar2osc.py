@@ -60,7 +60,7 @@ class Scanner(threading.Thread):
 
                 for scan in sweep.get_scans():
                     if self.done.is_set():
-                        sweep.set_motor_speed(0)
+                        #sweep.set_motor_speed(0)
                         self.queue.put_nowait(None)
                         break
                     else:
@@ -86,11 +86,16 @@ class TriggerOSC(threading.Thread):
 
     def __sweep2osc(self, scan):
         num_notes = 14
+        r_coverage = 400
         rnotes = [[] for i in range(num_notes)]
         for angle, distance, signal_strength in scan.samples:
-            if signal_strength > 150:
-                rnotes[int(angle * (num_notes/360000))].append(4000 - distance)
-        notes = [median(note)/4000 for note in rnotes]
+            if signal_strength > 150 and angle >= 0 and angle <= 360000 and distance < r_coverage:
+                rnotes[int(round(angle * ((num_notes-1)/360000)))].append(r_coverage - distance)
+        for i, note in enumerate(rnotes):
+            if not note:
+                rnotes[i].append(0)
+                
+        notes = [median(note)/r_coverage for note in rnotes]
         print(notes)
         self.sender.send_message('/trigger/prophet', notes)
 
