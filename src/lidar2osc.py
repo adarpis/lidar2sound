@@ -7,7 +7,7 @@ __author__ = "Adrian Arpi <aarpi@imaytec.com>"
 __date__ = "20 February 2019"
 
 __credits__ = """Guido van Rossum, for an excellent programming language.
-Edy Ayala and Universidad Politecnica Salesiana, for all theirs support on this.
+Edy Ayala and Universidad Politecnica Salesiana, for all theirs support on this project.
 """
 
 # Known bugs that can't be fixed here:
@@ -60,7 +60,7 @@ class Scanner(threading.Thread):
 
                 for scan in sweep.get_scans():
                     if self.done.is_set():
-                        sweep.set_motor_speed(0)
+                        #sweep.set_motor_speed(0)
                         self.queue.put_nowait(None)
                         break
                     else:
@@ -83,14 +83,20 @@ class TriggerOSC(threading.Thread):
         super().__init__()
         self.queue = queue
         self.sender = udp_client.SimpleUDPClient('127.0.0.1', 4559)
+        self.decimate = 0
 
     def __sweep2osc(self, scan):
         num_notes = 14
+        r_coverage = 30
         rnotes = [[] for i in range(num_notes)]
         for angle, distance, signal_strength in scan.samples:
-            if signal_strength > 150:
-                rnotes[int(angle * (num_notes/360000))].append(4000 - distance)
-        notes = [median(note)/4000 for note in rnotes]
+            if signal_strength > 150 and angle >= 0 and angle <= 360000 and distance < r_coverage:
+                rnotes[int(round(angle * ((num_notes-1)/360000)))].append(r_coverage - distance)
+        for i, note in enumerate(rnotes):
+            if not note:
+                rnotes[i].append(0)
+                
+        notes = [median(note)/r_coverage for note in rnotes]
         print(notes)
         self.sender.send_message('/trigger/prophet', notes)
 
@@ -111,7 +117,11 @@ class TriggerOSC(threading.Thread):
                 break
 
             print(len(scan.samples))
-            self.__sweep2osc(scan)
+            if self.decimate < 4:
+                self.decimate += 1
+            else:
+                self.__sweep2osc(scan)
+                self.decimate = 0
             self.queue.task_done()
 
 
@@ -127,7 +137,7 @@ def main():
     dev = sys.argv[1]
 
     done = threading.Event()
-    timer = threading.Timer(11, lambda: done.set())
+    timer = threading.Timer(300, lambda: done.set())
 
     fifo = queue.Queue()
 
