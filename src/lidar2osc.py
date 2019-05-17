@@ -82,6 +82,17 @@ class TriggerOSC(threading.Thread):
         self.queue = queue
         self.sender = udp_client.SimpleUDPClient('127.0.0.1', 4559)
 
+    def __sweep2osc(self, scan):
+        num_notes = 24
+        notes = [[] for i in range(num_notes)]
+        for angle, distance, signal_strength in scan.samples:
+            if signal_strength > 150:
+                notes[int(angle * (num_notes/360000))].append(distance)
+            
+        print(notes)
+
+        self.sender.send_message('/trigger/prophet', [50, 100, 0.5])
+
     # Iterate over the queue's scans blocking if the queue is
     # empty. If we see the producer's sentinel value we exit.
     #
@@ -99,8 +110,7 @@ class TriggerOSC(threading.Thread):
                 break
 
             print(len(scan.samples))
-            print([sample.angle for sample in scan.samples])
-            self.sender.send_message('/trigger/prophet', [50, 100, 0.5])
+            self.__sweep2osc(scan)
             self.queue.task_done()
 
 
@@ -116,7 +126,7 @@ def main():
     dev = sys.argv[1]
 
     done = threading.Event()
-    timer = threading.Timer(10, lambda: done.set())
+    timer = threading.Timer(11, lambda: done.set())
 
     fifo = queue.Queue()
 
