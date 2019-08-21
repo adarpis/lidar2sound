@@ -127,7 +127,7 @@ class TriggerOSC(threading.Thread):
 
 def main():
     if len(sys.argv) < 2:
-        sys.exit('python lidar2osc.py /dev/ttyUSB0')
+        sys.exit('Parameters error, you should use \'python lidar2osc.py /dev/ttyUSB0\' instead')
 
     if not __if_sweeppy__:
         print('SweepPy module is nedded, '
